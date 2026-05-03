@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Todo</title>
+
+    <style>
+        html, body {
+            min-height: 100%;
+            margin: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            background-image: url('./img/bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            font-family: "Orbitron", Arial, sans-serif;
+        }
+
+        .wrapper {
+            padding: 250px 20px 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            flex-direction: column;
+        }
+
+        .content {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            max-width: 1100px;
+            justify-content: center;
+        }
+
+        .input-wrap,
+        .btn-wrap {
+            display: inline-block;
+            position: relative;
+        }
+
+        .input-wrap {
+            flex: 1;
+        }
+
+        #taskInput {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 18px 24px;
+            font-size: 18px;
+            outline: none;
+            border-radius: 4px;
+            background: rgba(2, 6, 23, 0.65);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(10px);
+        }
+
+        #taskInput::placeholder {
+            color: rgba(255, 255, 255, 0.55);
+        }
+
+        .tech-btn {
+            height: 100%;
+            padding: 18px 34px;
+            cursor: pointer;
+            text-transform: uppercase;
+            background: rgba(15, 23, 42, 0.65);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            backdrop-filter: blur(10px);
+            transition: 0.3s;
+        }
+
+        .tech-btn:hover,
+        .tech-btn.active {
+            background: rgba(56, 189, 248, 0.25);
+            box-shadow: 0 0 18px rgba(56, 189, 248, 0.35);
+        }
+
+        .input-wrap::before,
+        .input-wrap::after,
+        .btn-wrap::before,
+        .btn-wrap::after {
+            content: "";
+            position: absolute;
+            background: white;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
+            transition: transform 0.4s cubic-bezier(0.77, 0, 0.18, 1);
+        }
+
+        .input-wrap::before {
+            height: 1px;
+            width: 101%;
+            left: -10px;
+            top: -6px;
+            transform: scaleX(0);
+        }
+
+        .input-wrap::after {
+            width: 1px;
+            height: 120%;
+            left: -5px;
+            top: -14px;
+            transform: scaleY(0);
+        }
+
+        .input-wrap:focus-within::before {
+            transform: scaleX(1);
+        }
+
+        .input-wrap:focus-within::after {
+            transform: scaleY(1);
+        }
+
+        .btn-wrap::before {
+            height: 1px;
+            width: 110%;
+            left: 0;
+            bottom: -4px;
+            transform: scaleX(0);
+        }
+
+        .btn-wrap::after {
+            width: 1px;
+            height: 110%;
+            right: -9px;
+            bottom: -10px;
+            transform: scaleY(0);
+        }
+
+        .btn-wrap:hover::before,
+        .btn-wrap.active::before {
+            transform: scaleX(1);
+        }
+
+        .btn-wrap:hover::after,
+        .btn-wrap.active::after {
+            transform: scaleY(1);
+        }
+
+        #taskList {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            gap: 20px;
+            font-size: 24px;
+            color: #fff;
+            background: rgba(2, 6, 23, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        li span {
+            flex: 1;
+            word-break: break-word;
+        }
+
+        .complete span {
+            text-decoration: line-through;
+            opacity: 0.5;
+        }
+
+        .delete-btn {
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(239, 68, 68, 0.25);
+            color: #fff;
+            transition: 0.3s;
+        }
+
+        .delete-btn:hover {
+            background: rgba(239, 68, 68, 0.45);
+            box-shadow: 0 0 14px rgba(239, 68, 68, 0.45);
+        }
+
+        @media (max-width: 768px) {
+            .wrapper {
+                padding-top: 120px;
+            }
+
+            .content {
+                flex-direction: column;
+            }
+
+            .tech-btn {
+                width: 100%;
+            }
+
+            li {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="wrapper">
+
+    <div class="content">
+        <div class="input-wrap">
+            <input id="taskInput" placeholder="Введите задачу">
+        </div>
+
+        <div class="btn-wrap">
+            <button id="addButton" class="tech-btn">Добавить</button>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="btn-wrap">
+            <button id="all" class="tech-btn">Все</button>
+        </div>
+
+        <div class="btn-wrap">
+            <button id="active" class="tech-btn">Активные</button>
+        </div>
+
+        <div class="btn-wrap">
+            <button id="completed" class="tech-btn">Готовые</button>
+        </div>
+    </div>
+
+    <ul id="taskList"></ul>
+</div>
+
+<script>
+    const tasks = [];
+    let currentFilter = 'all';
+
+    const input = document.getElementById('taskInput');
+    const addButton = document.getElementById('addButton');
+    const list = document.getElementById('taskList');
+
+    const filters = ['all', 'active', 'completed'];
+
+    const loadTasks = () => {
+        try {
+            const data = JSON.parse(localStorage.getItem('tasks'));
+
+            if (Array.isArray(data)) {
+                tasks.push(...data);
+            }
+        } catch {
+            localStorage.removeItem('tasks');
+        }
+    };
+
+    const saveTasks = () => {
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+    };
+
+    const getFilteredTasks = () => {
+        if (currentFilter === 'active') {
+            return tasks.filter(task => !task.completed);
+        }
+
+        if (currentFilter === 'completed') {
+            return tasks.filter(task => task.completed);
+        }
+
+        return tasks;
+    };
+
+    const renderTask = (taskItem, index) => {
+        const li = document.createElement('li');
+        const checkbox = document.createElement('input');
+        const text = document.createElement('span');
+        const deleteButton = document.createElement('button');
+
+        checkbox.type = 'checkbox';
+        checkbox.checked = taskItem.completed;
+
+        text.textContent = taskItem.text;
+
+        deleteButton.textContent = 'Х';
+        deleteButton.className = 'delete-btn';
+
+        if (taskItem.completed) {
+            li.classList.add('complete');
+        }
+
+        checkbox.addEventListener('change', () => {
+            tasks[index].completed = checkbox.checked;
+            saveTasks();
+            renderList();
+        });
+
+        deleteButton.addEventListener('click', () => {
+            tasks.splice(index, 1);
+            saveTasks();
+            renderList();
+        });
+
+        li.append(checkbox, text, deleteButton);
+        list.append(li);
+    };
+
+    const renderList = () => {
+        list.innerHTML = '';
+
+        const filteredTasks = getFilteredTasks();
+
+        filteredTasks.forEach(taskItem => {
+            const index = tasks.indexOf(taskItem);
+            renderTask(taskItem, index);
+        });
+    };
+
+    const addTask = () => {
+        const value = input.value.trim();
+
+        if (!value) {
+            alert('Введите задачу');
+            return;
+        }
+
+        tasks.push({
+            text: value,
+            completed: false
+        });
+
+        saveTasks();
+        renderList();
+
+        input.value = '';
+        input.focus();
+    };
+
+    const setActiveFilter = (id) => {
+        filters.forEach(filter => {
+            const button = document.getElementById(filter);
+
+            button.classList.remove('active');
+            button.parentElement.classList.remove('active');
+        });
+
+        const activeButton = document.getElementById(id);
+
+        activeButton.classList.add('active');
+        activeButton.parentElement.classList.add('active');
+    };
+
+    addButton.addEventListener('click', addTask);
+
+    input.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            addTask();
+        }
+    });
+
+    filters.forEach(id => {
+        document.getElementById(id).addEventListener('click', () => {
+            currentFilter = id;
+            setActiveFilter(id);
+            renderList();
+        });
+    });
+
+    loadTasks();
+    renderList();
+    setActiveFilter('all');
+</script>
+
+</body>
+</html>
